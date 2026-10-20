@@ -17,7 +17,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={selectId} className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
+          <label htmlFor={selectId} className="block text-[0.8125rem] font-semibold tracking-[0.02em] text-foreground mb-1.5">
             {label}
           </label>
         )}
@@ -25,9 +25,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={cn(
-            'w-full px-3 py-2 rounded-lg border bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-transparent',
-            error ? 'border-[var(--destructive)]' : 'border-[var(--border)]',
+            'w-full px-3 py-2.5 rounded-md border bg-surface text-foreground transition-colors duration-200 text-sm',
+            'focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-accent',
+            error ? 'border-destructive' : 'border-border-strong',
             className
           )}
           aria-invalid={error ? 'true' : 'false'}
@@ -38,7 +38,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-        {error && <p className="mt-1 text-sm text-[var(--destructive)]" role="alert">{error}</p>}
+        {error && <p className="mt-1 text-sm text-destructive" role="alert">{error}</p>}
       </div>
     );
   }

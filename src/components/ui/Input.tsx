@@ -18,7 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-[var(--foreground)] mb-1.5"
+            className="block text-[0.8125rem] font-semibold tracking-[0.02em] text-foreground mb-1.5"
           >
             {label}
           </label>
@@ -27,9 +27,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full px-3 py-2 rounded-lg border bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] transition-colors duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-transparent',
-            error ? 'border-[var(--destructive)]' : 'border-[var(--border)]',
+            'w-full px-3 py-2.5 rounded-md border bg-surface text-foreground placeholder:text-muted/70 transition-colors duration-200 text-sm',
+            'focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-accent',
+            error ? 'border-destructive' : 'border-border-strong',
             className
           )}
           aria-invalid={error ? 'true' : 'false'}
@@ -37,12 +37,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={`${inputId}-error`} className="mt-1 text-sm text-[var(--destructive)]" role="alert">
+          <p id={`${inputId}-error`} className="mt-1 text-sm text-destructive" role="alert">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p id={`${inputId}-helper`} className="mt-1 text-sm text-[var(--muted-foreground)]">
+          <p id={`${inputId}-helper`} className="mt-1 text-[0.8125rem] text-muted">
             {helperText}
           </p>
         )}

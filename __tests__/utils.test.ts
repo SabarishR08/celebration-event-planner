@@ -1,4 +1,11 @@
-import { formatCurrency, formatDate, calculateBudgetPercentage, getStatusColor, getEventTypeEmoji, daysUntilEvent } from '../src/lib/utils';
+import {
+  formatCurrency,
+  formatDate,
+  calculateBudgetPercentage,
+  getStatusColor,
+  getEventTypeLabel,
+  daysUntilEvent,
+} from '../src/lib/utils';
 
 describe('Utility Functions Test Suite', () => {
   test('formatCurrency formats numbers into USD currency string', () => {
@@ -12,16 +19,22 @@ describe('Utility Functions Test Suite', () => {
     expect(calculateBudgetPercentage(0, 0)).toBe(0);
   });
 
-  test('getEventTypeEmoji returns correct celebration emojis', () => {
-    expect(getEventTypeEmoji('wedding')).toBe('💒');
-    expect(getEventTypeEmoji('birthday')).toBe('🎂');
-    expect(getEventTypeEmoji('community')).toBe('🏘️');
-    expect(getEventTypeEmoji('unknown')).toBe('🎉');
+  test('getEventTypeLabel returns readable celebration labels', () => {
+    expect(getEventTypeLabel('wedding')).toBe('Wedding');
+    expect(getEventTypeLabel('birthday')).toBe('Birthday');
+    expect(getEventTypeLabel('community')).toBe('Community Gathering');
+    expect(getEventTypeLabel('unknown')).toBe('Celebration');
   });
 
-  test('getStatusColor returns appropriate styling badges', () => {
-    expect(getStatusColor('planning')).toContain('bg-blue-100');
-    expect(getStatusColor('confirmed')).toContain('bg-green-100');
-    expect(getStatusColor('cancelled')).toContain('bg-red-100');
+  test('getStatusColor returns palette tone classes for badges', () => {
+    // Success-toned statuses share the sage treatment
+    expect(getStatusColor('confirmed')).toContain('text-success');
+    expect(getStatusColor('completed')).toContain('text-success');
+    // Negative statuses share the wine treatment
+    expect(getStatusColor('cancelled')).toContain('text-destructive');
+    expect(getStatusColor('declined')).toContain('text-destructive');
+    // Unknown statuses fall back to a neutral tone
+    expect(getStatusColor('planning')).toContain('text-muted');
+    expect(getStatusColor('something-unknown')).toContain('text-muted');
   });
 });

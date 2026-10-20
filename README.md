@@ -54,9 +54,7 @@ CelebPlan AI is a next-generation celebration and event planning platform design
 
 ---
 
-## 🧠 GenAI Utilization Details
-
-CelebPlan AI utilizes the **NVIDIA API** running `meta/llama-3.1-70b-instruct`:
+## 🧠 GenAI Utilization DetailsCelebPlan AI utilizes the **NVIDIA API** running `meta/llama-3.1-70b-instruct`: 
 1. **Interactive Event Chat (`/api/chat`)**: Context-aware planning assistant that injects the current event's budget, date, vendor list, and tasks to provide deeply customized advice.
 2. **Automated Event Plan Generator (`generateEventPlan`)**: Transforms raw parameters (event type, budget, guest count) into an end-to-end event strategy including milestone checklists and day-of timelines.
 3. **Vendor Suggestions Engine (`generateVendorSuggestions`)**: Recommends appropriate vendor allocations and specific interview questions based on event scale.
@@ -108,7 +106,7 @@ CelebPlan AI utilizes the **NVIDIA API** running `meta/llama-3.1-70b-instruct`:
    DATABASE_URL=your_neon_postgres_connection_string
    NVIDIA_API_KEY=your_nvidia_api_key
    NVIDIA_API_BASE=https://integrate.api.nvidia.com/v1
-   NVIDIA_MODEL=meta/llama-3.1-70b-instruct
+   NVIDIA_MODEL=meta/llama-3.2-11b-vision-instruct
    JWT_SECRET=your_jwt_secret_key
    ```
 

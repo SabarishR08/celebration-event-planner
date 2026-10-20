@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PartyPopper, Sparkles, Mail, Lock, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { Wordmark, Fleuron, Monogram } from '@/components/layout/Brand';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,27 +42,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4">
-          <PartyPopper className="w-9 h-9 text-purple-600" />
-          <span className="text-2xl font-black gradient-text">CelebPlan AI</span>
-        </Link>
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Sign in to your account
-        </h2>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Or{' '}
-          <Link href="/auth/register" className="font-medium text-purple-600 hover:text-purple-500">
-            create a new account for free
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-14">
+      <div className="w-full max-w-md animate-rise">
+        <div className="text-center mb-7">
+          <Link href="/" className="inline-block mb-6">
+            <Wordmark />
           </Link>
-        </p>
-      </div>
+          <p className="eyebrow mb-3">Welcome back</p>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">
+            Return to your books
+          </h1>
+          <Fleuron className="mt-4 opacity-80" />
+        </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white dark:bg-gray-900 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100 dark:border-gray-800">
+        <div className="paper frame-ornate rounded-lg px-7 py-9 sm:px-9">
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400" role="alert">
+            <div
+              className="mb-5 px-4 py-3 rounded-md bg-destructive/10 border border-destructive/40 text-sm text-destructive"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -87,21 +86,24 @@ export default function LoginPage() {
               required
             />
 
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full py-2.5"
-              isLoading={loading}
-            >
-              Sign In <ArrowRight className="w-4 h-4 ml-1" />
+            <Button type="submit" variant="primary" className="w-full py-3 mt-1" isLoading={loading}>
+              Sign in
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800 text-center">
-            <p className="text-xs text-gray-500">
-              By signing in, you agree to organize magical & stress-free celebrations.
+          <div className="mt-7 pt-6 border-t border-border text-center">
+            <p className="text-[0.9375rem] text-muted">
+              No account yet?{' '}
+              <Link href="/auth/register" className="font-semibold text-primary hover:text-primary-hover transition-colors">
+                Request an invitation
+              </Link>
             </p>
           </div>
+        </div>
+
+        <div className="flex justify-center mt-7">
+          <Monogram size={22} className="text-accent opacity-70" />
         </div>
       </div>
     </div>

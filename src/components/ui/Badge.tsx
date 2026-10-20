@@ -9,11 +9,13 @@ interface BadgeProps {
 
 export default function Badge({ children, status, className }: BadgeProps) {
   return (
-    <span className={cn(
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-      status ? getStatusColor(status) : 'bg-gray-100 text-gray-800',
-      className
-    )}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full border px-2.5 py-[3px] text-[0.65rem] font-semibold uppercase tracking-[0.14em]',
+        status ? getStatusColor(status) : 'bg-surface-2 text-muted border-border-strong',
+        className
+      )}
+    >
       {children}
     </span>
   );

@@ -3,10 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  PartyPopper, LayoutDashboard, PlusCircle, Sparkles, 
-  LogOut, Calendar
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { Wordmark } from '@/components/layout/Brand';
+import { cn } from '@/lib/utils';
 
 interface NavbarProps {
   userName?: string;
@@ -26,37 +25,44 @@ export default function Navbar({ userName }: NavbarProps) {
   };
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/events/new', label: 'Create Event', icon: PlusCircle },
-    { href: '/chat', label: 'AI Planner Assistant', icon: Sparkles },
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/events/new', label: 'New Event' },
+    { href: '/chat', label: 'AI Atelier' },
   ];
 
   return (
-    <nav className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-[var(--border)] shadow-xs">
+    <nav
+      className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2" aria-label="CelebPlan AI Home">
-              <PartyPopper className="w-7 h-7 text-purple-600 dark:text-purple-400" />
-              <span className="text-xl font-bold gradient-text hidden sm:inline">CelebPlan AI</span>
-            </Link>
+          <div className="flex items-center gap-10">
+            <Wordmark href="/dashboard" markSize={30} />
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="hidden sm:flex items-center gap-7">
               {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
+                const isActive =
+                  pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cn(
+                      'relative py-1.5 text-[0.8125rem] font-medium tracking-[0.06em] uppercase transition-colors',
+                      isActive ? 'text-primary' : 'text-muted hover:text-foreground'
+                    )}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden md:inline">{link.label}</span>
+                    {link.label}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'absolute -bottom-0.5 left-0 right-0 h-px bg-accent transition-transform duration-300',
+                        isActive ? 'scale-x-100' : 'scale-x-0'
+                      )}
+                    />
                   </Link>
                 );
               })}
@@ -65,20 +71,42 @@ export default function Navbar({ userName }: NavbarProps) {
 
           <div className="flex items-center gap-4">
             {userName && (
-              <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
-                Hello, <strong className="text-gray-800 dark:text-gray-200">{userName}</strong>
+              <span className="hidden sm:inline text-[0.8125rem] text-muted">
+                <span className="eyebrow mr-1.5 text-accent">Host</span>
+                <span className="font-medium text-foreground">{userName}</span>
               </span>
             )}
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-muted hover:text-destructive transition-colors"
               title="Sign Out"
               aria-label="Sign Out"
             >
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">Sign out</span>
             </button>
           </div>
+        </div>
+
+        {/* Compact nav for small screens */}
+        <div className="sm:hidden flex items-center gap-5 pb-2.5 -mt-1 overflow-x-auto">
+          {navLinks.map((link) => {
+            const isActive =
+              pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={cn(
+                  'text-[0.75rem] font-medium tracking-[0.08em] uppercase whitespace-nowrap',
+                  isActive ? 'text-primary border-b border-accent pb-0.5' : 'text-muted'
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

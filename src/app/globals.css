@@ -1,61 +1,99 @@
 @import "tailwindcss";
 
+/*
+ * CelebPlan design system — "celebration atelier" stationery aesthetic.
+ * Warm ivory paper, wine ink, antique gold accents, editorial serif display.
+ * Dark mode is a matching espresso theme rather than pure black.
+ */
+
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #374151;
-  --accent: #f59e0b;
-  --accent-foreground: #451a03;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
-  --ring: #7c3aed;
-  --destructive: #ef4444;
-  --success: #10b981;
-  --warning: #f59e0b;
+  --background: #f5efe4;
+  --surface: #fdfaf3;
+  --surface-2: #efe7d7;
+  --foreground: #241d16;
+  --muted-foreground: #7c6c57;
+  --border: #e5dac7;
+  --border-strong: #d3c3a6;
+  --primary: #6e2b33;
+  --primary-hover: #57212a;
+  --primary-foreground: #fbf7ef;
+  --accent: #a57c3c;
+  --accent-foreground: #2b1f0c;
+  --accent-soft: #ece0c6;
+  --ink-panel: #241d16;
+  --ring: #a57c3c;
+  --success: #4d6a49;
+  --warning: #a57c3c;
+  --destructive: #8d3838;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #a78bfa;
-    --primary-foreground: #1e1b4b;
-    --secondary: #1f2937;
-    --secondary-foreground: #d1d5db;
-    --accent: #fbbf24;
-    --accent-foreground: #451a03;
-    --muted: #1f2937;
-    --muted-foreground: #9ca3af;
-    --border: #374151;
-    --ring: #a78bfa;
-    --destructive: #f87171;
-    --success: #34d399;
-    --warning: #fbbf24;
+    --background: #171310;
+    --surface: #201a15;
+    --surface-2: #2a231c;
+    --foreground: #f0e7d7;
+    --muted-foreground: #ac9c85;
+    --border: #372d23;
+    --border-strong: #4b3d2e;
+    --primary: #a4525b;
+    --primary-hover: #b96a72;
+    --primary-foreground: #fbf7ef;
+    --accent: #c9a25e;
+    --accent-foreground: #241a08;
+    --accent-soft: #32281a;
+    --ink-panel: #0f0c0a;
+    --ring: #c9a25e;
+    --success: #7c9a71;
+    --warning: #c9a25e;
+    --destructive: #c26a66;
   }
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-ink: var(--ink-panel);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, 'Times New Roman', serif;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
+  font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
+  /* Faint paper grain, purely decorative */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(165, 124, 60, 0.07), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
 }
 
 a {
@@ -65,8 +103,8 @@ a {
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -74,12 +112,12 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--muted-foreground);
-  border-radius: 3px;
+  background: var(--border-strong);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--foreground);
+  background: var(--muted-foreground);
 }
 
 /* Focus styles for accessibility */
@@ -104,7 +142,60 @@ a {
   top: 0;
 }
 
-/* Animation classes */
+/* Component classes live in the components layer so Tailwind utilities
+ * (utilities layer) can still override them where a page needs a tint. */
+@layer components {
+  /* Double-rule picture frame, like an engraved invitation border */
+  .frame-ornate {
+    border: 1px solid var(--border-strong);
+    box-shadow:
+      inset 0 0 0 3px var(--surface),
+      inset 0 0 0 4px var(--border);
+  }
+
+  .frame-ornate-dark {
+    border: 1px solid rgba(165, 124, 60, 0.45);
+    box-shadow:
+      inset 0 0 0 3px var(--ink-panel),
+      inset 0 0 0 4px rgba(165, 124, 60, 0.25);
+  }
+
+  /* Letterpress paper card */
+  .paper {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(36, 29, 22, 0.04), 0 8px 24px -16px rgba(36, 29, 22, 0.18);
+  }
+
+  .card-hover {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+    box-shadow: 0 2px 4px rgba(36, 29, 22, 0.05), 0 16px 32px -20px rgba(36, 29, 22, 0.3);
+  }
+
+  .font-display {
+    font-family: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+    font-variation-settings: 'SOFT' 20, 'WONK' 1;
+  }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -115,37 +206,45 @@ a {
   to { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
 }
 
+.animate-rise {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #7c3aed, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* Staggered entrances for editorial sections */
+.delay-1 { animation-delay: 0.08s; }
+.delay-2 { animation-delay: 0.16s; }
+.delay-3 { animation-delay: 0.24s; }
+.delay-4 { animation-delay: 0.32s; }
 
-/* Card hover effect */
-.card-hover {
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-in,
+  .animate-rise {
+    animation: none;
+  }
+  .card-hover:hover {
+    transform: none;
+  }
 }

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import { Send, AlertCircle } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
-import Card from '@/components/ui/Card';
+import { Fleuron, Monogram } from '@/components/layout/Brand';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { cn } from '@/lib/utils';
 
 interface Message {
   id?: number;
@@ -13,13 +14,14 @@ interface Message {
   content: string;
 }
 
+const OPENING_LETTER: Message = {
+  role: 'assistant',
+  content:
+    'Good afternoon. I am the CelebPlan concierge.\n\nTell me about the occasion you are drafting — the numbers, the mood, the constraints — and I will propose budgets, vendor checklists, day-of itineraries, and theme directions you can refine.',
+};
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hello! I am your AI Celebration & Event Planner Assistant powered by GenAI. I can help you organize weddings, birthdays, anniversaries, and community gatherings. Ask me about budget allocations, vendor contract checklists, day-of timelines, or creative themes!",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([OPENING_LETTER]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -61,73 +63,74 @@ export default function ChatPage() {
   };
 
   const samplePrompts = [
-    "Plan a cozy 30th birthday party with a $2,500 budget and 30 guests",
-    "What are the essential vendor checklist items for an autumn outdoor wedding?",
-    "Generate an hourly day-of timeline for an evening community gala",
-    "How should I split a $15,000 wedding budget across catering, venue, and decor?",
+    'A cosy 30th birthday — $2,500, 30 guests',
+    'Vendor checklist for an autumn outdoor wedding',
+    'Hourly day-of timeline for an evening community gala',
+    'How should $15,000 split across catering, venue, and décor?',
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main id="main-content" className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
-        <div className="mb-4">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-purple-600" />
-            CelebPlan GenAI Assistant
+      <main id="main-content" className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col">
+        <header className="text-center mb-7">
+          <p className="eyebrow mb-3">Correspondence</p>
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight">
+            The concierge&apos;s desk
           </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Intelligent planning advice for budgets, schedules, vendors, & creative concepts.
+          <p className="text-muted text-[0.9375rem] mt-2 max-w-lg mx-auto leading-relaxed">
+            Budgets, schedules, vendors, and creative directions — answered in plain language.
           </p>
-        </div>
+          <Fleuron className="mt-4 opacity-80" />
+        </header>
 
-        {/* Chat Conversation Box */}
-        <Card padding="md" className="flex-1 flex flex-col h-[650px] shadow-sm border border-gray-200 dark:border-gray-800">
-          <div className="flex-1 overflow-y-auto space-y-4 p-2 sm:p-4">
+        {/* Conversation sheet */}
+        <div className="paper rounded-lg flex-1 flex flex-col min-h-[34rem] max-h-[42rem] overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-5 sm:px-7 py-6 space-y-6" aria-live="polite">
             {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              <div key={idx} className={cn('flex gap-3.5', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                 {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4" />
-                  </div>
+                  <Monogram size={30} className="text-accent mt-0.5" />
                 )}
 
                 <div
-                  className={`max-w-[80%] rounded-2xl p-4 text-sm whitespace-pre-wrap leading-relaxed ${
+                  className={cn(
+                    'max-w-[85%] px-4.5 py-3.5 text-[0.9375rem] leading-relaxed',
                     msg.role === 'user'
-                      ? 'bg-purple-600 text-white rounded-br-none'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-none border border-gray-200 dark:border-gray-700'
-                  }`}
+                      ? 'bg-primary text-primary-foreground rounded-md rounded-br-sm px-4'
+                      : 'paper rounded-md rounded-bl-sm px-4 whitespace-pre-wrap'
+                  )}
                 >
+                  {msg.role === 'assistant' && (
+                    <p className="eyebrow mb-1.5">Concierge</p>
+                  )}
                   {msg.content}
                 </div>
 
                 {msg.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-center shrink-0">
-                    <User className="w-4 h-4" />
-                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 w-8 h-8 shrink-0 rounded-full border border-border-strong bg-surface-2 flex items-center justify-center text-[0.7rem] font-semibold tracking-widest uppercase text-muted"
+                  >
+                    You
+                  </span>
                 )}
               </div>
             ))}
 
             {loading && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 animate-pulse" />
-                </div>
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-none p-4 text-sm text-gray-500 border border-gray-200 dark:border-gray-700 flex items-center gap-2">
-                  <LoadingSpinner size="sm" /> CelebPlan AI is crafting your recommendations...
+              <div className="flex gap-3.5 justify-start">
+                <Monogram size={30} className="text-accent mt-0.5 animate-pulse" />
+                <div className="paper rounded-md rounded-bl-sm px-4 py-3 text-sm text-muted flex items-center gap-2.5">
+                  <LoadingSpinner size="sm" /> Drafting a considered reply…
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 text-red-600 text-xs rounded-xl flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="px-4 py-3 bg-destructive/10 border border-destructive/40 text-destructive text-sm rounded-md flex items-center gap-2" role="alert">
+                <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
                 <span>{error}</span>
               </div>
             )}
@@ -135,41 +138,44 @@ export default function ChatPage() {
             <div ref={chatEndRef} />
           </div>
 
-          {/* Prompt Suggestions */}
+          {/* Suggested correspondence */}
           {messages.length <= 2 && (
-            <div className="p-2 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-xs text-gray-400 mb-2 font-medium">Try asking:</p>
+            <div className="px-5 sm:px-7 pb-4 border-t border-border pt-4">
+              <p className="eyebrow mb-2.5">Try beginning with</p>
               <div className="flex flex-wrap gap-2">
                 {samplePrompts.map((p, i) => (
                   <button
                     key={i}
-                    onClick={() => {
-                      setInput(p);
-                    }}
-                    className="text-xs bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 px-2.5 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 text-left transition-colors"
+                    onClick={() => setInput(p)}
+                    className="text-[0.8125rem] px-3 py-1.5 rounded-full border border-border-strong text-muted hover:border-accent hover:text-primary transition-colors text-left"
                   >
-                    &ldquo;{p}&rdquo;
+                    {p}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Input Bar */}
-          <form onSubmit={handleSend} className="p-2 sm:p-3 border-t border-gray-100 dark:border-gray-800 flex gap-2">
+          {/* Compose bar */}
+          <form onSubmit={handleSend} className="border-t border-border p-3 sm:p-4 flex gap-2.5 bg-surface-2/40">
+            <label htmlFor="chat-input" className="sr-only">
+              Write to the concierge
+            </label>
             <input
+              id="chat-input"
               type="text"
-              className="flex-1 px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-600"
-              placeholder="Ask anything about timelines, budget optimization, vendor questions..."
+              className="flex-1 px-4 py-2.5 text-sm rounded-md border border-border-strong bg-surface focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-accent transition-colors"
+              placeholder="Ask about timelines, budgets, vendors, or themes…"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
             />
-            <Button type="submit" variant="primary" disabled={loading || !input.trim()}>
-              <Send className="w-4 h-4" />
+            <Button type="submit" variant="primary" disabled={loading || !input.trim()} className="px-4">
+              <Send className="w-4 h-4" aria-hidden="true" />
+              <span className="sr-only">Send</span>
             </Button>
           </form>
-        </Card>
+        </div>
       </main>
     </div>
   );

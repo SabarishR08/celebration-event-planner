@@ -39,7 +39,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-[2px] animate-fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -48,20 +48,20 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={cn('w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl animate-fade-in', sizes[size])}
+        className={cn('w-full paper rounded-lg animate-rise', sizes[size])}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b border-[var(--border)]">
-          <h2 id="modal-title" className="text-lg font-semibold">{title}</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h2 id="modal-title" className="font-display text-xl font-semibold tracking-tight">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-[var(--secondary)] transition-colors"
+            className="p-1.5 rounded-md text-muted hover:text-foreground hover:bg-surface-2 transition-colors"
             aria-label="Close modal"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
-        <div className="p-4">{children}</div>
+        <div className="p-5">{children}</div>
       </div>
     </div>
   );

@@ -9,14 +9,16 @@ interface CardProps {
 }
 
 export default function Card({ children, className, hover = false, padding = 'md' }: CardProps) {
-  const paddings = { sm: 'p-3', md: 'p-5', lg: 'p-6' };
+  const paddings = { sm: 'p-3', md: 'p-5', lg: 'p-6 sm:p-7' };
   return (
-    <div className={cn(
-      'bg-white dark:bg-gray-800 rounded-xl border border-[var(--border)] shadow-sm',
-      paddings[padding],
-      hover && 'card-hover cursor-pointer',
-      className
-    )}>
+    <div
+      className={cn(
+        'paper rounded-lg',
+        paddings[padding],
+        hover && 'card-hover cursor-pointer',
+        className
+      )}
+    >
       {children}
     </div>
   );

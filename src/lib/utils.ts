@@ -41,42 +41,48 @@ export function calculateBudgetPercentage(spent: number, total: number): number 
 }
 
 /**
- * Returns a color class based on the status.
+ * Returns a tone class set for a status badge.
+ * Tones are drawn from the CelebPlan palette (ink, gold, sage, wine) rather
+ * than default tailwind rainbows, so badges read as engraved stationery.
  */
 export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    planning: 'bg-blue-100 text-blue-800',
-    confirmed: 'bg-green-100 text-green-800',
-    in_progress: 'bg-yellow-100 text-yellow-800',
-    completed: 'bg-emerald-100 text-emerald-800',
-    cancelled: 'bg-red-100 text-red-800',
-    pending: 'bg-gray-100 text-gray-800',
-    contacted: 'bg-blue-100 text-blue-800',
-    booked: 'bg-purple-100 text-purple-800',
-    accepted: 'bg-green-100 text-green-800',
-    declined: 'bg-red-100 text-red-800',
-    maybe: 'bg-yellow-100 text-yellow-800',
-    low: 'bg-gray-100 text-gray-800',
-    medium: 'bg-blue-100 text-blue-800',
-    high: 'bg-orange-100 text-orange-800',
-    urgent: 'bg-red-100 text-red-800',
+  const tones: Record<string, string> = {
+    // Event lifecycle
+    planning: 'bg-surface-2 text-muted border-border-strong',
+    confirmed: 'bg-success/10 text-success border-success/40',
+    in_progress: 'bg-accent/10 text-accent border-accent/40',
+    completed: 'bg-success/10 text-success border-success/40',
+    cancelled: 'bg-destructive/10 text-destructive border-destructive/40',
+    // Vendors
+    pending: 'bg-surface-2 text-muted border-border-strong',
+    contacted: 'bg-surface-2 text-muted border-border-strong',
+    booked: 'bg-accent/10 text-accent border-accent/40',
+    // RSVP
+    accepted: 'bg-success/10 text-success border-success/40',
+    declined: 'bg-destructive/10 text-destructive border-destructive/40',
+    maybe: 'bg-accent/10 text-accent border-accent/40',
+    // Priorities
+    low: 'bg-surface-2 text-muted border-border-strong',
+    medium: 'bg-accent/10 text-accent border-accent/40',
+    high: 'bg-primary/10 text-primary border-primary/40',
+    urgent: 'bg-destructive/10 text-destructive border-destructive/40',
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return tones[status] || 'bg-surface-2 text-muted border-border-strong';
 }
 
 /**
- * Returns an emoji for event types.
+ * Human-readable labels for event types.
  */
-export function getEventTypeEmoji(type: string): string {
-  const emojis: Record<string, string> = {
-    wedding: '💒',
-    birthday: '🎂',
-    community: '🏘️',
-    corporate: '🏢',
-    anniversary: '💍',
-    other: '🎉',
+export function getEventTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    wedding: 'Wedding',
+    birthday: 'Birthday',
+    community: 'Community Gathering',
+    corporate: 'Corporate Event',
+    anniversary: 'Anniversary',
+    other: 'Celebration',
   };
-  return emojis[type] || '🎉';
+  return labels[type] || 'Celebration';
 }
 
 /**

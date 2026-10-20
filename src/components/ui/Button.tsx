@@ -19,20 +19,23 @@ export default function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] disabled:opacity-50 disabled:cursor-not-allowed';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center font-medium tracking-[0.04em] rounded-md transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50 disabled:cursor-not-allowed';
+
   const variants = {
-    primary: 'bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 shadow-sm',
-    secondary: 'bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:bg-gray-200 dark:hover:bg-gray-700',
-    outline: 'border-2 border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--secondary)]',
-    ghost: 'text-[var(--foreground)] hover:bg-[var(--secondary)]',
-    destructive: 'bg-[var(--destructive)] text-white hover:opacity-90',
+    primary:
+      'bg-primary text-primary-foreground hover:bg-primary-hover shadow-[0_1px_0_rgba(0,0,0,0.12)]',
+    secondary:
+      'bg-surface-2 text-foreground border border-border-strong hover:border-accent hover:text-primary',
+    outline: 'border border-border-strong text-foreground hover:border-accent hover:text-primary bg-transparent',
+    ghost: 'text-muted hover:text-foreground hover:bg-surface-2',
+    destructive: 'bg-destructive text-primary-foreground hover:opacity-90',
   };
 
   const sizes = {
-    sm: 'text-sm px-3 py-1.5 gap-1.5',
+    sm: 'text-[0.8125rem] px-3 py-1.5 gap-1.5',
     md: 'text-sm px-4 py-2 gap-2',
-    lg: 'text-base px-6 py-3 gap-2.5',
+    lg: 'text-[0.95rem] px-6 py-3 gap-2.5',
   };
 
   return (
