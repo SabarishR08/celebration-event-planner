@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
-  PartyPopper, LayoutDashboard, PlusCircle, MessageSquareSparkles, 
+  PartyPopper, LayoutDashboard, PlusCircle, Sparkles, 
   LogOut, Calendar
 } from 'lucide-react';
 
@@ -28,7 +28,7 @@ export default function Navbar({ userName }: NavbarProps) {
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/events/new', label: 'Create Event', icon: PlusCircle },
-    { href: '/chat', label: 'AI Planner Assistant', icon: MessageSquareSparkles },
+    { href: '/chat', label: 'AI Planner Assistant', icon: Sparkles },
   ];
 
   return (

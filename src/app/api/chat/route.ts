@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { getAuthUserFromRequest } from '@/lib/auth';
-import { chatMessageSchema } from '@/lib/validations';
+import { chatMessageSchema, sanitizeInput } from '@/lib/validations';
 import { generateAIResponse, type ChatMessage } from '@/lib/ai';
-import { checkRateLimit, sanitizeInput } from '@/lib/utils';
+import { checkRateLimit } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
