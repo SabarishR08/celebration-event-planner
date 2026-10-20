@@ -2,14 +2,16 @@ import OpenAI from 'openai';
 
 /**
  * NVIDIA AI client using OpenAI-compatible API.
- * Uses meta/llama-3.1-70b-instruct for intelligent event planning assistance.
+ * Uses meta/llama-3.2-11b-vision-instruct for intelligent event planning assistance.
  */
-const aiClient = new OpenAI({
-  apiKey: process.env.NVIDIA_API_KEY || '',
-  baseURL: process.env.NVIDIA_API_BASE || 'https://integrate.api.nvidia.com/v1',
-});
+function getAIClient() {
+  return new OpenAI({
+    apiKey: process.env.NVIDIA_API_KEY || '',
+    baseURL: process.env.NVIDIA_API_BASE || 'https://integrate.api.nvidia.com/v1',
+  });
+}
 
-const AI_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct';
+const AI_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.2-11b-vision-instruct';
 
 /**
  * System prompt for the event planning assistant.
@@ -65,6 +67,7 @@ export async function generateAIResponse(
       });
     }
 
+    const aiClient = getAIClient();
     const response = await aiClient.chat.completions.create({
       model: AI_MODEL,
       messages: [...systemMessages, ...messages],
