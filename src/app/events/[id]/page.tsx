@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -17,7 +17,7 @@ import Input from '@/components/ui/Input';
 import Modal from '@/components/ui/Modal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import EmptyState from '@/components/ui/EmptyState';
-import { Event, Vendor, Task, BudgetItem, Guest, TimelineItem } from '@/types';
+import { Event, Vendor, Task, BudgetItem, Guest, TimelineItem, TaskPriority } from '@/types';
 import { formatCurrency, formatDate, getEventTypeLabel, cn } from '@/lib/utils';
 
 type TabId = 'overview' | 'vendors' | 'tasks' | 'budget' | 'guests' | 'timeline' | 'ai';
@@ -46,7 +46,12 @@ export default function EventDetailPage() {
 
   // Forms
   const [vendorForm, setVendorForm] = useState({ name: '', category: 'Catering', estimated_cost: 0, contact_email: '', contact_phone: '', notes: '' });
-  const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium' as any, due_date: '' });
+  const [taskForm, setTaskForm] = useState<{ title: string; description: string; priority: TaskPriority; due_date: string }>({
+    title: '',
+    description: '',
+    priority: 'medium',
+    due_date: '',
+  });
   const [budgetForm, setBudgetForm] = useState({ category: 'Venue', description: '', estimated_amount: 0, actual_amount: 0 });
   const [guestForm, setGuestForm] = useState({ name: '', email: '', phone: '', plus_one: false, dietary_restrictions: '' });
   const [timelineForm, setTimelineForm] = useState({ title: '', description: '', start_time: '', category: 'General' });
@@ -202,10 +207,22 @@ export default function EventDetailPage() {
     }
   };
 
-  const totalSpent = budgetItems.reduce((acc, b) => acc + Number(b.actual_amount || b.estimated_amount || 0), 0);
-  const totalAllocated = budgetItems.reduce((acc, b) => acc + Number(b.estimated_amount || 0), 0);
-  const completedTasks = tasks.filter((t) => t.status === 'completed').length;
-  const acceptedRsvps = guests.filter((g) => g.rsvp_status === 'accepted').length;
+  const totalSpent = useMemo(
+    () => budgetItems.reduce((acc, b) => acc + Number(b.actual_amount || b.estimated_amount || 0), 0),
+    [budgetItems]
+  );
+  const totalAllocated = useMemo(
+    () => budgetItems.reduce((acc, b) => acc + Number(b.estimated_amount || 0), 0),
+    [budgetItems]
+  );
+  const completedTasks = useMemo(
+    () => tasks.filter((t) => t.status === 'completed').length,
+    [tasks]
+  );
+  const acceptedRsvps = useMemo(
+    () => guests.filter((g) => g.rsvp_status === 'accepted').length,
+    [guests]
+  );
 
   if (loading || !event) {
     return (

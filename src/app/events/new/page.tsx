@@ -61,8 +61,8 @@ export default function NewEventPage() {
       }
 
       router.push(`/events/${data.data.id}`);
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }

@@ -55,8 +55,8 @@ export default function ChatPage() {
       }
 
       setMessages([...newMessages, { role: 'assistant', content: data.data.message }]);
-    } catch (err: any) {
-      setError(err.message || 'Error communicating with AI');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error communicating with AI');
     } finally {
       setLoading(false);
     }
