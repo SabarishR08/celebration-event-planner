@@ -1,5 +1,13 @@
 import 'openai/shims/node';
-import { SYSTEM_PROMPT, AI_MODEL, TOKEN_BUDGETS, generateStructuredTimeline } from '../src/lib/ai';
+import {
+  SYSTEM_PROMPT,
+  AI_MODEL,
+  TOKEN_BUDGETS,
+  generateStructuredTimeline,
+  generateEventPlan,
+  generateVendorSuggestions,
+  generateBudgetAdvice,
+} from '../src/lib/ai';
 
 describe('GenAI Module Architecture, Token Ceilings & Structured Output', () => {
   test('SYSTEM_PROMPT embeds event planning persona and constraints', () => {
@@ -36,5 +44,32 @@ describe('GenAI Module Architecture, Token Ceilings & Structured Output', () => 
     expect(milestones[0]).toHaveProperty('start_time');
     expect(milestones[0]).toHaveProperty('category');
     expect(milestones[0]).toHaveProperty('sort_order');
+  });
+
+  test('generateEventPlan interface safely handles plan requests', async () => {
+    await expect(
+      generateEventPlan({
+        type: 'wedding',
+        budget: 25000,
+        guestCount: 80,
+        date: '2026-12-15',
+        location: 'Highland Estate',
+      })
+    ).rejects.toThrow();
+  });
+
+  test('generateVendorSuggestions safely handles categorized requests', async () => {
+    await expect(
+      generateVendorSuggestions('corporate', 10000, 'Metropolis')
+    ).rejects.toThrow();
+  });
+
+  test('generateBudgetAdvice safely handles allocation requests', async () => {
+    await expect(
+      generateBudgetAdvice('birthday', 3000, [
+        { category: 'Catering', amount: 1500 },
+        { category: 'Decor', amount: 500 },
+      ])
+    ).rejects.toThrow();
   });
 });

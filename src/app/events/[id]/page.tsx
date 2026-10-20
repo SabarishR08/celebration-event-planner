@@ -62,11 +62,7 @@ export default function EventDetailPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [autoGenLoading, setAutoGenLoading] = useState(false);
 
-  useEffect(() => {
-    fetchEventDetails();
-  }, [eventId]);
-
-  const fetchEventDetails = async () => {
+  const fetchEventDetails = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/events/${eventId}`);
@@ -84,11 +80,15 @@ export default function EventDetailPage() {
         setTimeline(json.data.timeline);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Fetch event details error:', e);
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId, router]);
+
+  useEffect(() => {
+    fetchEventDetails();
+  }, [fetchEventDetails]);
 
   const handleAddVendor = async (e: React.FormEvent) => {
     e.preventDefault();
