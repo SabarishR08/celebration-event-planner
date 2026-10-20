@@ -102,7 +102,10 @@ export function daysUntilEvent(eventDate: string): number {
 }
 
 /**
- * Rate limiter using in-memory store (suitable for serverless with reasonable limits).
+ * Lightweight rate limiter using an in-memory sliding window map.
+ * Note: Designed for serverless instance isolation and demo safety. For distributed
+ * enterprise production, this can seamlessly swap to an Upstash Redis or Vercel KV
+ * distributed token bucket limiter without altering call site signatures.
  */
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 

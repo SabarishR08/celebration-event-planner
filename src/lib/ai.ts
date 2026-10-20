@@ -2,58 +2,66 @@ import OpenAI from 'openai';
 
 /**
  * NVIDIA AI client using OpenAI-compatible API.
- * Uses meta/llama-3.2-11b-vision-instruct for intelligent event planning assistance.
+ * Uses meta/llama-3.1-70b-instruct for high-fidelity celebration planning assistance.
  */
 function getAIClient() {
   return new OpenAI({
     apiKey: process.env.NVIDIA_API_KEY || '',
     baseURL: process.env.NVIDIA_API_BASE || 'https://integrate.api.nvidia.com/v1',
+    dangerouslyAllowBrowser: true,
   });
 }
 
-const AI_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.2-11b-vision-instruct';
+export const AI_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct';
 
 /**
- * System prompt for the event planning assistant.
+ * Granular token ceilings per AI operation to enforce strict efficiency,
+ * minimize API latency, and avoid token exhaustion.
  */
-const SYSTEM_PROMPT = `You are CelebPlan AI, an expert celebration and event planning assistant. You help users organize weddings, birthdays, anniversaries, community events, and corporate events.
+export const TOKEN_BUDGETS = {
+  CHAT_CONCIERGE: 800,        // Fast conversational answers with 10-message bounded context
+  FULL_EVENT_PLAN: 1500,      // Exhaustive multi-category milestone breakdown
+  VENDOR_SUGGESTIONS: 600,    // Scoped category directory guidance
+  BUDGET_ADVICE: 500,         // Crisp ledger optimization insights
+  STRUCTURED_TIMELINE: 600,   // JSON timeline array for direct DB ingestion
+} as const;
+
+/**
+ * System prompt for the celebration planning assistant.
+ */
+export const SYSTEM_PROMPT = `You are CelebPlan AI, an expert celebration atelier assistant. You help users organize weddings, birthdays, anniversaries, community events, and corporate celebrations.
 
 Your capabilities include:
-1. **Event Planning**: Create comprehensive event plans with timelines, checklists, and milestones
-2. **Budget Management**: Suggest budget breakdowns, track expenses, and recommend cost-saving strategies
-3. **Vendor Recommendations**: Suggest vendor categories, provide checklists for vendor selection
-4. **Guest Management**: Help with guest list organization, seating arrangements, RSVP tracking
-5. **Theme & Decoration Ideas**: Provide creative theme suggestions, color palettes, and decoration ideas
-6. **Timeline Creation**: Build detailed day-of timelines and planning timelines
-7. **Cultural Considerations**: Account for cultural traditions, dietary requirements, and accessibility needs
+1. Event Planning: Create comprehensive event plans with milestones and checklists
+2. Budget Management: Suggest budget allocations and cost-saving strategies
+3. Vendor Selection: Suggest vendor categories with negotiation tips
+4. Guest Experience: Advise on hospitality, seating, and dietary inclusivity
+5. Theme & Styling: Provide creative aesthetic directions and color palettes
+6. Day-of Timelines: Build chronological run-of-show schedules
 
 Guidelines:
-- Always be enthusiastic and supportive about the user's celebration plans
-- Provide specific, actionable advice with concrete examples
-- Consider budget constraints and suggest alternatives at different price points
-- Ask clarifying questions when needed to provide better recommendations
-- Format responses with clear headings, bullet points, and organized sections
-- When suggesting budgets, use realistic price ranges
-- Always consider accessibility and inclusivity in your suggestions
-- Provide seasonal and location-specific advice when relevant
-
-When the user provides event details, structure your response with:
-- A brief summary of understanding
-- Specific recommendations organized by category
-- Action items or next steps
-- Any important considerations or tips`;
+- Maintain an encouraging, sophisticated, and supportive tone
+- Provide specific, actionable advice with realistic price and time estimates
+- Format responses cleanly with markdown headings and concise bullet points
+- Always consider accessibility, dietary accommodations, and guest comfort`;
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
+export interface AIRequestOptions {
+  maxTokens?: number;
+  temperature?: number;
+}
+
 /**
- * Generates an AI response for event planning queries.
+ * Generates an AI response for event planning queries with tuned token budgets.
  */
 export async function generateAIResponse(
   messages: ChatMessage[],
-  eventContext?: string
+  eventContext?: string,
+  options?: AIRequestOptions
 ): Promise<string> {
   try {
     const systemMessages: ChatMessage[] = [
@@ -63,7 +71,7 @@ export async function generateAIResponse(
     if (eventContext) {
       systemMessages.push({
         role: 'system',
-        content: `Current event context:\n${eventContext}`,
+        content: `Current celebration context:\n${eventContext}`,
       });
     }
 
@@ -71,12 +79,15 @@ export async function generateAIResponse(
     const response = await aiClient.chat.completions.create({
       model: AI_MODEL,
       messages: [...systemMessages, ...messages],
-      max_tokens: 2048,
-      temperature: 0.7,
+      max_tokens: options?.maxTokens || TOKEN_BUDGETS.CHAT_CONCIERGE,
+      temperature: options?.temperature ?? 0.7,
       top_p: 0.9,
     });
 
-    return response.choices[0]?.message?.content || 'I apologize, but I was unable to generate a response. Please try again.';
+    return (
+      response.choices[0]?.message?.content ||
+      'I apologize, but I was unable to compose a response. Please try again.'
+    );
   } catch (error) {
     console.error('AI response generation error:', error);
     throw new Error('Failed to generate AI response. Please try again later.');
@@ -84,7 +95,7 @@ export async function generateAIResponse(
 }
 
 /**
- * Generates a structured event plan based on event details.
+ * Generates an end-to-end event plan with custom token budget.
  */
 export async function generateEventPlan(eventDetails: {
   type: string;
@@ -95,49 +106,46 @@ export async function generateEventPlan(eventDetails: {
   theme?: string;
   notes?: string;
 }): Promise<string> {
-  const prompt = `Please create a comprehensive event plan for the following celebration:
+  const prompt = `Please create a comprehensive event plan for this celebration:
+- Type: ${eventDetails.type}
+- Budget: $${eventDetails.budget.toLocaleString()}
+- Expected Guests: ${eventDetails.guestCount}
+${eventDetails.date ? `- Date: ${eventDetails.date}` : ''}
+${eventDetails.location ? `- Location: ${eventDetails.location}` : ''}
+${eventDetails.theme ? `- Theme: ${eventDetails.theme}` : ''}
+${eventDetails.notes ? `- Notes: ${eventDetails.notes}` : ''}
 
-**Event Type**: ${eventDetails.type}
-**Budget**: $${eventDetails.budget.toLocaleString()}
-**Expected Guests**: ${eventDetails.guestCount}
-${eventDetails.date ? `**Date**: ${eventDetails.date}` : ''}
-${eventDetails.location ? `**Location**: ${eventDetails.location}` : ''}
-${eventDetails.theme ? `**Theme**: ${eventDetails.theme}` : ''}
-${eventDetails.notes ? `**Additional Notes**: ${eventDetails.notes}` : ''}
+Provide:
+1. Budget breakdown with percentage allocations
+2. Milestone checklist working backward from celebration date
+3. Priority vendor directory requirements
+4. Day-of run of show highlights`;
 
-Please provide:
-1. A detailed budget breakdown with categories and estimated costs
-2. A planning timeline with key milestones (working backward from the event date)
-3. A vendor checklist with recommended vendor categories
-4. Theme and decoration suggestions
-5. A day-of timeline
-6. Important tips and considerations`;
-
-  return generateAIResponse([{ role: 'user', content: prompt }]);
+  return generateAIResponse([{ role: 'user', content: prompt }], undefined, {
+    maxTokens: TOKEN_BUDGETS.FULL_EVENT_PLAN,
+    temperature: 0.7,
+  });
 }
 
 /**
- * Generates vendor suggestions based on event type and budget.
+ * Generates vendor suggestions with scoped token budget.
  */
 export async function generateVendorSuggestions(
   eventType: string,
   budget: number,
   location?: string
 ): Promise<string> {
-  const prompt = `Suggest vendors needed for a ${eventType} event with a budget of $${budget.toLocaleString()}${location ? ` in ${location}` : ''}.
+  const prompt = `Suggest essential vendor categories for a ${eventType} with a budget of $${budget.toLocaleString()}${location ? ` in ${location}` : ''}.
+For each category give: estimated budget share, key contract questions, and cost-saving tip.`;
 
-For each vendor category, provide:
-1. Why they're needed
-2. Estimated cost range (within the budget)
-3. Key questions to ask when hiring
-4. What to look for in a contract
-5. Tips for saving money`;
-
-  return generateAIResponse([{ role: 'user', content: prompt }]);
+  return generateAIResponse([{ role: 'user', content: prompt }], undefined, {
+    maxTokens: TOKEN_BUDGETS.VENDOR_SUGGESTIONS,
+    temperature: 0.6,
+  });
 }
 
 /**
- * Generates budget optimization suggestions.
+ * Generates budget optimization suggestions with minimal token spend.
  */
 export async function generateBudgetAdvice(
   eventType: string,
@@ -147,26 +155,91 @@ export async function generateBudgetAdvice(
   const spendingDetails = currentSpending
     .map((s) => `- ${s.category}: $${s.amount.toLocaleString()}`)
     .join('\n');
-
   const totalSpent = currentSpending.reduce((sum, s) => sum + s.amount, 0);
   const remaining = totalBudget - totalSpent;
 
-  const prompt = `Help me optimize the budget for my ${eventType} event.
-
-**Total Budget**: $${totalBudget.toLocaleString()}
-**Currently Allocated**:
+  const prompt = `Analyze budget for a ${eventType}:
+Total: $${totalBudget.toLocaleString()}
+Allocated: $${totalSpent.toLocaleString()}
+Remaining: $${remaining.toLocaleString()}
+Line items:
 ${spendingDetails}
-**Total Allocated**: $${totalSpent.toLocaleString()}
-**Remaining**: $${remaining.toLocaleString()}
 
-Please provide:
-1. Analysis of current budget allocation
-2. Recommendations for areas that might be over/under-allocated
-3. Cost-saving tips for each category
-4. Suggestions for the remaining budget
-5. Priority items to consider`;
+Give 3 quick recommendations to rebalance or protect the remaining buffer.`;
 
-  return generateAIResponse([{ role: 'user', content: prompt }]);
+  return generateAIResponse([{ role: 'user', content: prompt }], undefined, {
+    maxTokens: TOKEN_BUDGETS.BUDGET_ADVICE,
+    temperature: 0.5,
+  });
 }
 
-export { AI_MODEL, SYSTEM_PROMPT };
+export interface StructuredTimelineMilestone {
+  title: string;
+  description: string;
+  start_time: string;
+  category: string;
+  sort_order: number;
+}
+
+/**
+ * Generates a structured JSON timeline array that the application parses
+ * directly into timeline table rows.
+ */
+export async function generateStructuredTimeline(event: {
+  title: string;
+  event_type: string;
+  guest_count: number;
+  location?: string;
+  theme?: string;
+}): Promise<StructuredTimelineMilestone[]> {
+  const prompt = `Create a realistic chronological 5-moment run-of-show itinerary for this celebration:
+Event: "${event.title}" (${event.event_type})
+Guest Count: ${event.guest_count}
+${event.theme ? `Theme: ${event.theme}` : ''}
+${event.location ? `Location: ${event.location}` : ''}
+
+Respond ONLY with a valid JSON array of 5 objects matching this exact structure:
+[
+  {
+    "title": "Vendor Arrival & Setup",
+    "description": "Catering and staging check-in",
+    "start_time": "15:00",
+    "category": "Setup",
+    "sort_order": 1
+  }
+]`;
+
+  try {
+    const raw = await generateAIResponse(
+      [{ role: 'user', content: prompt }],
+      undefined,
+      { maxTokens: TOKEN_BUDGETS.STRUCTURED_TIMELINE, temperature: 0.4 }
+    );
+
+    // Extract JSON block if wrapped in markdown
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((item, index) => ({
+          title: String(item.title || `Moment ${index + 1}`),
+          description: String(item.description || ''),
+          start_time: String(item.start_time || '18:00'),
+          category: String(item.category || 'General'),
+          sort_order: Number(item.sort_order || index + 1),
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn('AI structured timeline parsing fallback:', err);
+  }
+
+  // Graceful deterministic fallback if AI is rate-limited or JSON malformed
+  return [
+    { title: 'Vendor Check-in & Audio Check', description: 'Catering and staging readiness', start_time: '15:00', category: 'Logistics', sort_order: 1 },
+    { title: 'Guest Arrival & Welcome Refreshments', description: 'Greeting attendees and welcome beverage service', start_time: '17:30', category: 'Reception', sort_order: 2 },
+    { title: 'Ceremony / Opening Remarks', description: 'Core celebration ceremony and formal welcome', start_time: '18:30', category: 'Ceremony', sort_order: 3 },
+    { title: 'Dinner / Banquet Service', description: 'Catered dining service and celebratory toasts', start_time: '19:30', category: 'Dining', sort_order: 4 },
+    { title: 'Celebration Music & Farewell', description: 'Dancing, music, and closing farewell', start_time: '21:30', category: 'Entertainment', sort_order: 5 },
+  ];
+}

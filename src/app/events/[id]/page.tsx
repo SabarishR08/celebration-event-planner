@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Calendar, Users, Wallet, Clock, CheckSquare,
-  Plus, ArrowLeft, Building2, MapPin, Send, PenLine
+  Plus, ArrowLeft, Building2, MapPin, Send, PenLine, Sparkles
 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import { Fleuron, Monogram } from '@/components/layout/Brand';
@@ -60,6 +60,7 @@ export default function EventDetailPage() {
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiResponses, setAiResponses] = useState<{ role: string; content: string }[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [autoGenLoading, setAutoGenLoading] = useState(false);
 
   useEffect(() => {
     fetchEventDetails();
@@ -97,13 +98,14 @@ export default function EventDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...vendorForm, estimated_cost: Number(vendorForm.estimated_cost) }),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setVendorModal(false);
         setVendorForm({ name: '', category: 'Catering', estimated_cost: 0, contact_email: '', contact_phone: '', notes: '' });
-        fetchEventDetails();
+        setVendors((prev) => [data.data, ...prev]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Add vendor error:', err);
     }
   };
 
@@ -115,13 +117,14 @@ export default function EventDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskForm),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setTaskModal(false);
         setTaskForm({ title: '', description: '', priority: 'medium', due_date: '' });
-        fetchEventDetails();
+        setTasks((prev) => [...prev, data.data]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Add task error:', err);
     }
   };
 
@@ -137,13 +140,14 @@ export default function EventDetailPage() {
           actual_amount: Number(budgetForm.actual_amount),
         }),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setBudgetModal(false);
         setBudgetForm({ category: 'Venue', description: '', estimated_amount: 0, actual_amount: 0 });
-        fetchEventDetails();
+        setBudgetItems((prev) => [data.data, ...prev]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Add budget item error:', err);
     }
   };
 
@@ -155,13 +159,14 @@ export default function EventDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(guestForm),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setGuestModal(false);
         setGuestForm({ name: '', email: '', phone: '', plus_one: false, dietary_restrictions: '' });
-        fetchEventDetails();
+        setGuests((prev) => [...prev, data.data]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Add guest error:', err);
     }
   };
 
@@ -173,13 +178,31 @@ export default function EventDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(timelineForm),
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setTimelineModal(false);
         setTimelineForm({ title: '', description: '', start_time: '', category: 'General' });
-        fetchEventDetails();
+        setTimeline((prev) => [...prev, data.data]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Add timeline error:', err);
+    }
+  };
+
+  const handleAutoGenerateTimeline = async () => {
+    try {
+      setAutoGenLoading(true);
+      const res = await fetch(`/api/events/${eventId}/timeline/generate`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (res.ok && data.success && Array.isArray(data.data)) {
+        setTimeline((prev) => [...prev, ...data.data]);
+      }
+    } catch (err) {
+      console.error('Auto generate timeline error:', err);
+    } finally {
+      setAutoGenLoading(false);
     }
   };
 
@@ -547,12 +570,12 @@ export default function EventDetailPage() {
                         checked={t.status === 'completed'}
                         onChange={async () => {
                           const newStatus = t.status === 'completed' ? 'pending' : 'completed';
+                          setTasks((prev) => prev.map((item) => (item.id === t.id ? { ...item, status: newStatus } : item)));
                           await fetch(`/api/events/${eventId}/tasks`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ taskId: t.id, status: newStatus }),
                           });
-                          fetchEventDetails();
                         }}
                         className="w-4 h-4 accent-[var(--primary)] cursor-pointer"
                         aria-label={`Mark ${t.title} as ${t.status === 'completed' ? 'pending' : 'completed'}`}
@@ -709,9 +732,21 @@ export default function EventDetailPage() {
             {sectionHeader(
               'The day-of book',
               'Run of show for the wedding party, vendors, and hosts.',
-              <Button size="sm" onClick={() => setTimelineModal(true)} className="inline-flex items-center gap-1.5">
-                <Plus className="w-4 h-4" aria-hidden="true" /> Add moment
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleAutoGenerateTimeline}
+                  isLoading={autoGenLoading}
+                  className="inline-flex items-center gap-1.5 border-accent text-accent hover:bg-accent/10"
+                  aria-label="Auto-draft celebration itinerary with AI"
+                >
+                  <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" /> AI Auto-Draft Itinerary
+                </Button>
+                <Button size="sm" onClick={() => setTimelineModal(true)} className="inline-flex items-center gap-1.5">
+                  <Plus className="w-4 h-4" aria-hidden="true" /> Add moment
+                </Button>
+              </div>
             )}
 
             {timeline.length === 0 ? (
@@ -721,9 +756,21 @@ export default function EventDetailPage() {
                   title="The itinerary is blank"
                   description="Map guest arrival, the ceremony, dinner, toasts, and the send-off."
                   action={
-                    <Button variant="outline" size="sm" onClick={() => setTimelineModal(true)} className="mt-2">
-                      Add the first moment
-                    </Button>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-3">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handleAutoGenerateTimeline}
+                        isLoading={autoGenLoading}
+                        className="inline-flex items-center gap-1.5"
+                      >
+                        <Sparkles className="w-4 h-4" aria-hidden="true" />
+                        Auto-Draft with AI
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setTimelineModal(true)}>
+                        Add custom moment
+                      </Button>
+                    </div>
                   }
                 />
               </div>
